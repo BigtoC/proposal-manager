@@ -1,7 +1,4 @@
-use cosmwasm_std::{
-    ensure, Coin, MessageInfo,
-    StdResult, Uint128
-};
+use cosmwasm_std::{ensure, Coin, MessageInfo, StdResult, Uint128};
 use std::collections::HashMap;
 
 use crate::error::ContractError;

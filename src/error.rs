@@ -1,6 +1,6 @@
 use cosmwasm_std::{
-    CheckedMultiplyFractionError, DivideByZeroError, Instantiate2AddressError, OverflowError, StdError,
-    Uint128,
+    CheckedMultiplyFractionError, DivideByZeroError, Instantiate2AddressError, OverflowError,
+    StdError, Uint128,
 };
 use cw_migrate_error_derive::cw_migrate_invalid_version_error;
 use cw_ownable::OwnershipError;
@@ -39,9 +39,7 @@ pub enum ContractError {
     #[error(
         "Assertion failed; can only cancel proposal in pending status, swap amount: {current_status}"
     )]
-    CancelProposalInvalidStatus {
-        current_status: String,
-    },
+    CancelProposalInvalidStatus { current_status: String },
 
     #[error("An overflow occurred when attempting to construct a decimal")]
     DecimalOverflow,
@@ -66,6 +64,9 @@ pub enum ContractError {
 
     #[error("The gift fee was not paid.")]
     GiftFeeNotPaid,
+
+    #[error("The receiver cannot be the proposer")]
+    InvalidReceiver,
 }
 
 impl From<semver::Error> for ContractError {

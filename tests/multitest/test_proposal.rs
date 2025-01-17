@@ -1,18 +1,16 @@
-use cosmwasm_std::{coin, coins, Addr, BlockInfo, Coin, Empty, Event, Timestamp, Order};
+use cosmwasm_std::{coin, Order};
 use cw_multi_test::{next_block, AppResponse};
 
 use crate::multitest::suite::TestingSuite;
 use proposal::error::ContractError;
-use proposal::proposal::state::ProposalStatus;
 use proposal::msg::{ProposalBy, ProposalsResponse};
+use proposal::proposal::state::ProposalStatus;
 
 const INITIAL_BALANCE: u128 = 1_000_000;
 
 #[test]
 fn test_proposal_creation() {
-    let mut suite = TestingSuite::default_with_balances(
-        vec![coin(INITIAL_BALANCE, "uom")]
-        );
+    let mut suite = TestingSuite::default_with_balances(vec![coin(INITIAL_BALANCE, "uom")]);
 
     let admin = &suite.admin();
     let proposer = suite.senders[1].clone();
@@ -20,16 +18,16 @@ fn test_proposal_creation() {
 
     // Test creating proposal with insufficient funds
     suite
-    .instantiate_proposal_contract(Some(admin.to_string()))
-    .create_proposal(
-        &proposer,
-        Some("Title".to_string()),
-        Some("Speech".to_string()),
-        receiver.to_string(),
-        vec![],
-        &[],
-        |r| assert!(matches!(r, Err(_))),
-    );
+        .instantiate_proposal_contract(Some(admin.to_string()))
+        .create_proposal(
+            &proposer,
+            Some("Title".to_string()),
+            Some("Speech".to_string()),
+            receiver.to_string(),
+            vec![],
+            &[],
+            |r| assert!(matches!(r, Err(_))),
+        );
 
     // Test successful proposal creation
     suite.create_proposal(
@@ -53,9 +51,7 @@ fn test_proposal_creation() {
 
 #[test]
 fn test_cancel_proposal() {
-    let mut suite = TestingSuite::default_with_balances(
-        vec![coin(INITIAL_BALANCE, "uom")]
-        );
+    let mut suite = TestingSuite::default_with_balances(vec![coin(INITIAL_BALANCE, "uom")]);
 
     let admin = &suite.admin();
     let proposer = suite.senders[1].clone();
@@ -63,16 +59,16 @@ fn test_cancel_proposal() {
 
     // Create proposal
     suite
-    .instantiate_proposal_contract(Some(admin.to_string()))
-    .create_proposal(
-        &proposer,
-        None,
-        None,
-        receiver.to_string(),
-        vec![],
-        &[coin(100, "uom")],
-        |r: Result<AppResponse, anyhow::Error>| assert!(r.is_ok()),
-    );
+        .instantiate_proposal_contract(Some(admin.to_string()))
+        .create_proposal(
+            &proposer,
+            None,
+            None,
+            receiver.to_string(),
+            vec![],
+            &[coin(100, "uom")],
+            |r: Result<AppResponse, anyhow::Error>| assert!(r.is_ok()),
+        );
 
     // Test canceling by non-proposer
     suite.cancel_proposal(&receiver, 0, |r: Result<AppResponse, anyhow::Error>| {
@@ -83,7 +79,9 @@ fn test_cancel_proposal() {
     });
 
     // Test successful cancellation
-    suite.cancel_proposal(&proposer, 0, |r: Result<AppResponse, anyhow::Error>| assert!(r.is_ok()));
+    suite.cancel_proposal(&proposer, 0, |r: Result<AppResponse, anyhow::Error>| {
+        assert!(r.is_ok())
+    });
 
     // Verify proposal was deleted
     suite.query_proposal(0, |r: Result<proposal::proposal::state::Proposal, cosmwasm_std::StdError>| assert!(r.is_err()));
@@ -91,9 +89,7 @@ fn test_cancel_proposal() {
 
 #[test]
 fn test_proposal_response() {
-    let mut suite = TestingSuite::default_with_balances(
-        vec![coin(INITIAL_BALANCE, "uom")]
-        );
+    let mut suite = TestingSuite::default_with_balances(vec![coin(INITIAL_BALANCE, "uom")]);
 
     let admin = &suite.admin();
     let proposer = suite.senders[1].clone();
@@ -102,24 +98,29 @@ fn test_proposal_response() {
 
     // Create proposal with gift
     suite
-    .instantiate_proposal_contract(Some(admin.to_string()))
-    .create_proposal(
-        &proposer,
-        None,
-        None,
-        receiver.to_string(),
-        gift.clone(),
-        &[coin(600, "uom")], // 100 for fee + 500 for gift
-        |r: Result<AppResponse, anyhow::Error>| assert!(r.is_ok()),
-    );
+        .instantiate_proposal_contract(Some(admin.to_string()))
+        .create_proposal(
+            &proposer,
+            None,
+            None,
+            receiver.to_string(),
+            gift.clone(),
+            &[coin(600, "uom")], // 100 for fee + 500 for gift
+            |r: Result<AppResponse, anyhow::Error>| assert!(r.is_ok()),
+        );
 
     // Test saying yes by non-receiver
-    suite.say_yes(&proposer, 0, None, |r: Result<AppResponse, anyhow::Error>| {
-        assert!(matches!(
-            r.unwrap_err().downcast().unwrap(),
-            ContractError::Unauthorized
-        ))
-    });
+    suite.say_yes(
+        &proposer,
+        0,
+        None,
+        |r: Result<AppResponse, anyhow::Error>| {
+            assert!(matches!(
+                r.unwrap_err().downcast().unwrap(),
+                ContractError::Unauthorized
+            ))
+        },
+    );
 
     // Test successful yes response
     suite.say_yes(
@@ -130,25 +131,54 @@ fn test_proposal_response() {
     );
 
     // Verify proposal status and gift transfer
-    suite.query_proposal(0, |r: Result<proposal::proposal::state::Proposal, cosmwasm_std::StdError>| {
-        let proposal = r.unwrap();
-        assert_eq!(proposal.status, ProposalStatus::Yes);
-        assert_eq!(proposal.reply, Some("I accept!".to_string()));
-    });
+    suite.query_proposal(
+        0,
+        |r: Result<proposal::proposal::state::Proposal, cosmwasm_std::StdError>| {
+            let proposal = r.unwrap();
+            assert_eq!(proposal.status, ProposalStatus::Yes);
+            assert_eq!(proposal.reply, Some("I accept!".to_string()));
+        },
+    );
+
+    // Test saying no by non-receiver
+    suite
+        .create_proposal(
+            &proposer,
+            None,
+            None,
+            receiver.to_string(),
+            gift.clone(),
+            &[coin(600, "uom")], // 100 for fee + 500 for gift
+            |r: Result<AppResponse, anyhow::Error>| assert!(r.is_ok()),
+        )
+        .say_no(
+            &proposer,
+            1,
+            None,
+            |r: Result<AppResponse, anyhow::Error>| {
+                assert!(matches!(
+                    r.unwrap_err().downcast().unwrap(),
+                    ContractError::Unauthorized
+                ))
+            },
+        )
+        .say_no(
+            &receiver,
+            1,
+            Some("I decline!".to_string()),
+            |r: Result<AppResponse, anyhow::Error>| assert!(r.is_ok()),
+        );
 }
 
 #[test]
 fn test_query_proposals() {
-    let mut suite = TestingSuite::default_with_balances(
-        vec![coin(INITIAL_BALANCE, "uom")]
-        );
+    let mut suite = TestingSuite::default_with_balances(vec![coin(INITIAL_BALANCE, "uom")]);
 
     let admin = &suite.admin();
     let proposer = suite.senders[1].clone();
     let receiver = suite.senders[2].clone();
 
-    suite
-    .instantiate_proposal_contract(Some(admin.to_string()));
+    suite.instantiate_proposal_contract(Some(admin.to_string()));
 
     // Create multiple proposals
     for i in 0..3 {
@@ -192,21 +222,19 @@ fn test_query_proposals() {
 
 #[test]
 fn test_update_config() {
-    let mut suite = TestingSuite::default_with_balances(
-        vec![coin(INITIAL_BALANCE, "uom")]
-        );
+    let mut suite = TestingSuite::default_with_balances(vec![coin(INITIAL_BALANCE, "uom")]);
 
     let admin = suite.admin();
     let non_admin = suite.senders[1].clone();
 
     // Test update by non-admin
     suite
-    .instantiate_proposal_contract(Some(admin.to_string()))
-    .update_config(
-        &non_admin,
-        Some(coin(200, "uom")),
-        |r: Result<AppResponse, anyhow::Error>| assert!(r.is_err()),
-    );
+        .instantiate_proposal_contract(Some(admin.to_string()))
+        .update_config(
+            &non_admin,
+            Some(coin(200, "uom")),
+            |r: Result<AppResponse, anyhow::Error>| assert!(r.is_err()),
+        );
 
     // Test successful update
     suite.update_config(
@@ -216,8 +244,10 @@ fn test_update_config() {
     );
 
     // Verify config update
-    suite.query_config(|r: Result<proposal::proposal::state::Config, cosmwasm_std::StdError>| {
-        let config = r.unwrap();
-        assert_eq!(config.successful_proposal_fee, coin(200, "uom"));
-    });
+    suite.query_config(
+        |r: Result<proposal::proposal::state::Config, cosmwasm_std::StdError>| {
+            let config = r.unwrap();
+            assert_eq!(config.successful_proposal_fee, coin(200, "uom"));
+        },
+    );
 }

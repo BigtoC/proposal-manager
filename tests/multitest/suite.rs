@@ -1,10 +1,10 @@
-use cosmwasm_std::{coin, Addr, Coin, Empty, StdResult, Timestamp, Uint128, Order};
+use cosmwasm_std::{coin, Addr, Coin, Empty, Order, StdResult, Timestamp, Uint128};
 use cw_multi_test::{
     App, AppBuilder, AppResponse, BankKeeper, Contract, ContractWrapper, Executor, MockApiBech32,
     WasmKeeper,
 };
 
-use proposal::msg::{ExecuteMsg, InstantiateMsg, QueryMsg, ProposalBy, ProposalsResponse};
+use proposal::msg::{ExecuteMsg, InstantiateMsg, ProposalBy, ProposalsResponse, QueryMsg};
 use proposal::proposal::state::{Config, Proposal, ProposalStatus};
 
 type WasmApp = App<BankKeeper, MockApiBech32>;
@@ -95,7 +95,10 @@ impl TestingSuite {
 
     #[track_caller]
     pub fn instantiate_proposal_contract(&mut self, owner: Option<String>) -> &mut Self {
-        let msg = InstantiateMsg { owner, successful_proposal_fee: coin(100, "uom") };
+        let msg = InstantiateMsg {
+            owner,
+            successful_proposal_fee: coin(100, "uom"),
+        };
 
         let proposal_contract_code_id = self.app.store_code(proposal_contract());
         let admin = self.admin();
@@ -177,14 +180,9 @@ impl TestingSuite {
         &mut self,
         sender: &Addr,
         id: u64,
-        result: impl ResultHandler
+        result: impl ResultHandler,
     ) -> &mut Self {
-        self.execute_contract(
-            sender,
-            ExecuteMsg::CancelProposal { id },
-            &[],
-            result
-        )
+        self.execute_contract(sender, ExecuteMsg::CancelProposal { id }, &[], result)
     }
 
     #[track_caller]
@@ -218,7 +216,9 @@ impl TestingSuite {
     ) -> &mut Self {
         self.execute_contract(
             sender,
-            ExecuteMsg::UpdateConfig { successful_proposal_fee },
+            ExecuteMsg::UpdateConfig {
+                successful_proposal_fee,
+            },
             &[],
             result,
         )
@@ -260,22 +260,25 @@ impl TestingSuite {
     pub fn query_proposal(&mut self, id: u64, result: impl Fn(StdResult<Proposal>)) -> &mut Self {
         self.query_contract(QueryMsg::Proposal { id }, result)
     }
-    
+
     #[track_caller]
     pub fn query_proposals(
-        &mut self, 
+        &mut self,
         limit: Option<u32>,
         filter_by: Option<ProposalBy>,
         status: Option<ProposalStatus>,
         sort: Option<Order>,
-        result: impl Fn(StdResult<ProposalsResponse>)
+        result: impl Fn(StdResult<ProposalsResponse>),
     ) -> &mut Self {
-        self.query_contract(QueryMsg::Proposals {
-            limit,
-            filter_by,
-            status,
-            sort,
-        }, result)
+        self.query_contract(
+            QueryMsg::Proposals {
+                limit,
+                filter_by,
+                status,
+                sort,
+            },
+            result,
+        )
     }
 
     #[track_caller]

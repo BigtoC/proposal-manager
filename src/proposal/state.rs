@@ -1,7 +1,7 @@
-use std::fmt;
 use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Addr, Coin};
 use cw_storage_plus::{index_list, IndexedMap, Item, MultiIndex};
+use std::fmt;
 
 pub const MAX_ITEMS_LIMIT: u32 = 100;
 pub const DEFAULT_LIMIT: u32 = 10;

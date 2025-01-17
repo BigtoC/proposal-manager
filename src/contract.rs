@@ -3,15 +3,15 @@ use cosmwasm_std::entry_point;
 
 use crate::error::ContractError;
 use crate::helpers::{
-    aggregate_coins,
-    validate_fees_are_paid, validate_no_additional_funds_sent_with_proposal_creation,
+    aggregate_coins, validate_fees_are_paid,
+    validate_no_additional_funds_sent_with_proposal_creation,
 };
-use crate::validate_contract;
-use crate::msg::{ExecuteMsg, InstantiateMsg, ProposalBy, ProposalsResponse, QueryMsg, MigrateMsg};
+use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, ProposalBy, ProposalsResponse, QueryMsg};
 use crate::proposal::state::{
     Config, Proposal, ProposalStatus, CONFIG, DEFAULT_LIMIT, FAILED_COUNTER, MAX_ITEMS_LIMIT,
     PROPOSALS, PROPOSAL_COUNTER, SUCCESSFUL_COUNTER,
 };
+use crate::validate_contract;
 use cosmwasm_std::{
     to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Order, Response, StdError,
 };
@@ -41,8 +41,8 @@ pub fn instantiate(
     FAILED_COUNTER.save(deps.storage, &0)?;
 
     let owner = deps
-            .api
-            .addr_validate(&msg.owner.unwrap_or(info.sender.into_string()))?;
+        .api
+        .addr_validate(&msg.owner.unwrap_or(info.sender.into_string()))?;
     cw_ownable::initialize_owner(deps.storage, deps.api, Some(owner.as_str()))?;
 
     Ok(Response::default().add_attributes(vec![
@@ -71,6 +71,10 @@ pub fn execute(
             gift,
         } => {
             let config = CONFIG.load(deps.storage)?;
+            // proposer is not the receiver
+            if info.sender == deps.api.addr_validate(&receiver)? {
+                return Err(ContractError::InvalidReceiver);
+            }
             let gift = aggregate_coins(gift)?;
             // check if the proposal and gift fees were paid
             let total_fees =
@@ -304,7 +308,6 @@ pub fn migrate(deps: DepsMut, _env: Env, _msg: MigrateMsg) -> Result<Response, C
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     Ok(Response::default())
 }
-
 
 fn query_config(deps: Deps) -> Result<Binary, StdError> {
     let config = CONFIG.load(deps.storage)?;
