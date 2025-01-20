@@ -84,7 +84,12 @@ fn test_cancel_proposal() {
     });
 
     // Verify proposal was deleted
-    suite.query_proposal(0, |r: Result<proposal_manager::proposal::state::Proposal, cosmwasm_std::StdError>| assert!(r.is_err()));
+    suite.query_proposal(
+        0,
+        |r: Result<proposal_manager::proposal::state::Proposal, cosmwasm_std::StdError>| {
+            assert!(r.is_err())
+        },
+    );
 }
 
 #[test]
@@ -172,15 +177,22 @@ fn test_proposal_response() {
 
 #[test]
 fn test_proposal_multiple_gift_different_denom() {
-    let mut suite = TestingSuite::default_with_balances(vec![coin(INITIAL_BALANCE, "uom"), coin(INITIAL_BALANCE, "ibc/xxx")]);
+    let mut suite = TestingSuite::default_with_balances(vec![
+        coin(INITIAL_BALANCE, "uom"),
+        coin(INITIAL_BALANCE, "ibc/xxx"),
+    ]);
 
     let admin = &suite.admin();
     let proposer = suite.senders[1].clone();
     let receiver = suite.senders[2].clone();
     let mut receiver_existing_balance_in_uom = coin(0, "uom");
     let mut receiver_existing_balance_in_ibc_xxx = coin(0, "ibc/xxx");
-    suite.query_balance("uom", &receiver, |r: cosmwasm_std::Uint128| receiver_existing_balance_in_uom = coin(r.into(), "uom"));
-    suite.query_balance("ibc/xxx", &receiver, |r: cosmwasm_std::Uint128| receiver_existing_balance_in_ibc_xxx = coin(r.into(), "ibc/xxx"));
+    suite.query_balance("uom", &receiver, |r: cosmwasm_std::Uint128| {
+        receiver_existing_balance_in_uom = coin(r.into(), "uom")
+    });
+    suite.query_balance("ibc/xxx", &receiver, |r: cosmwasm_std::Uint128| {
+        receiver_existing_balance_in_ibc_xxx = coin(r.into(), "ibc/xxx")
+    });
 
     let gift = vec![coin(500, "uom"), coin(100, "ibc/xxx")];
 
@@ -216,11 +228,28 @@ fn test_proposal_multiple_gift_different_denom() {
     );
 
     // Verify gift transfer
-    suite.query_balance("uom", &receiver, |r: cosmwasm_std::Uint128| assert_eq!(r, receiver_existing_balance_in_ibc_xxx.amount.checked_add(Uint128::new(500)).unwrap() ));
-    suite.query_balance("ibc/xxx", &receiver, |r: cosmwasm_std::Uint128| assert_eq!(r, receiver_existing_balance_in_ibc_xxx.amount.checked_add(Uint128::new(100)).unwrap() ));
+    suite.query_balance("uom", &receiver, |r: cosmwasm_std::Uint128| {
+        assert_eq!(
+            r,
+            receiver_existing_balance_in_ibc_xxx
+                .amount
+                .checked_add(Uint128::new(500))
+                .unwrap()
+        )
+    });
+    suite.query_balance("ibc/xxx", &receiver, |r: cosmwasm_std::Uint128| {
+        assert_eq!(
+            r,
+            receiver_existing_balance_in_ibc_xxx
+                .amount
+                .checked_add(Uint128::new(100))
+                .unwrap()
+        )
+    });
 }
 
-#[test]fn test_query_proposals() {
+#[test]
+fn test_query_proposals() {
     let mut suite = TestingSuite::default_with_balances(vec![coin(INITIAL_BALANCE, "uom")]);
 
     let admin = &suite.admin();
