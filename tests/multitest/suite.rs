@@ -4,18 +4,18 @@ use cw_multi_test::{
     WasmKeeper,
 };
 
-use proposal::msg::{ExecuteMsg, InstantiateMsg, ProposalBy, ProposalsResponse, QueryMsg};
-use proposal::proposal::state::{Config, Proposal, ProposalStatus};
+use proposal_manager::msg::{ExecuteMsg, InstantiateMsg, ProposalBy, ProposalsResponse, QueryMsg};
+use proposal_manager::proposal::state::{Config, Proposal, ProposalStatus};
 
 type WasmApp = App<BankKeeper, MockApiBech32>;
 
-pub fn proposal_contract() -> Box<dyn Contract<Empty>> {
+pub fn proposal_manager_contract() -> Box<dyn Contract<Empty>> {
     let contract = ContractWrapper::new(
-        proposal::contract::execute,
-        proposal::contract::instantiate,
-        proposal::contract::query,
+        proposal_manager::contract::execute,
+        proposal_manager::contract::instantiate,
+        proposal_manager::contract::query,
     )
-    .with_migrate(proposal::contract::migrate);
+    .with_migrate(proposal_manager::contract::migrate);
 
     Box::new(contract)
 }
@@ -23,7 +23,7 @@ pub fn proposal_contract() -> Box<dyn Contract<Empty>> {
 pub struct TestingSuite {
     app: WasmApp,
     pub senders: [Addr; 4],
-    pub proposal_contract_addr: Addr,
+    pub proposal_manager_contract_addr: Addr,
 }
 
 // helpers
@@ -89,7 +89,7 @@ impl TestingSuite {
         TestingSuite {
             app,
             senders: senders.try_into().unwrap(),
-            proposal_contract_addr: Addr::unchecked(""),
+            proposal_manager_contract_addr: Addr::unchecked(""),
         }
     }
 
@@ -100,10 +100,10 @@ impl TestingSuite {
             successful_proposal_fee: coin(100, "uom"),
         };
 
-        let proposal_contract_code_id = self.app.store_code(proposal_contract());
+        let proposal_contract_code_id = self.app.store_code(proposal_manager_contract());
         let admin = self.admin();
 
-        self.proposal_contract_addr = self
+        self.proposal_manager_contract_addr = self
             .app
             .instantiate_contract(
                 proposal_contract_code_id,
@@ -143,7 +143,7 @@ impl TestingSuite {
     ) -> &mut Self {
         result.handle_result(self.app.execute_contract(
             sender.clone(),
-            self.proposal_contract_addr.clone(),
+            self.proposal_manager_contract_addr.clone(),
             &msg,
             funds,
         ));
@@ -244,7 +244,7 @@ impl TestingSuite {
         let response: StdResult<T> = self
             .app
             .wrap()
-            .query_wasm_smart(&self.proposal_contract_addr, &msg);
+            .query_wasm_smart(&self.proposal_manager_contract_addr, &msg);
 
         result(response);
 
@@ -294,7 +294,7 @@ impl TestingSuite {
         &mut self,
         denom: &str,
         address: &Addr,
-        result: impl Fn(Uint128),
+        mut result: impl FnMut(Uint128),
     ) -> &mut Self {
         let balance_response = self.app.wrap().query_balance(address, denom);
         result(balance_response.unwrap_or(coin(0, denom)).amount);

@@ -1,5 +1,5 @@
 
-# Proposal Contract
+# Proposal Manager Contract
 
 A CosmWasm smart contract that enables users to create and manage proposals with optional gifts. The contract facilitates proposal creation, responses, and gift transfers between proposers and receivers.
 
