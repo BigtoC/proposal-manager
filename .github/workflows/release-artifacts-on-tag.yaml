@@ -8,6 +8,8 @@ on:
 jobs:
   release-artifacts:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
