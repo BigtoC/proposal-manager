@@ -20,7 +20,7 @@ use cw2::set_contract_version;
 use cw_storage_plus::IndexPrefix;
 
 // version info for migration info
-const CONTRACT_NAME: &str = "proposal-witness";
+const CONTRACT_NAME: &str = "proposal-manager";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[cfg_attr(not(feature = "library"), entry_point)]
