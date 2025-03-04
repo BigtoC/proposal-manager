@@ -33,6 +33,7 @@ A CosmWasm smart contract that enables users to create and manage proposals with
 - `Proposal`: Get proposal details by ID
 - `Proposals`: List proposals with optional filters
 - `Ownership`: Get current contract ownership
+- `Status`: Get proposal manager status
 
 ### State
 

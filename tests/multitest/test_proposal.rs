@@ -47,6 +47,17 @@ fn test_proposal_creation() {
         assert_eq!(proposal.receiver, receiver);
         assert_eq!(proposal.status, ProposalStatus::Pending);
     });
+
+    // Verify proposal manager status
+    suite.query_status(|r| {
+        let status = r.unwrap();
+        assert_eq!(status.total_proposals, 1);
+        assert_eq!(status.total_proposals_cancelled, 0);
+        assert_eq!(status.total_proposals_yes, 0);
+        assert_eq!(status.total_proposals_no, 0);
+        assert_eq!(status.total_proposals_pending, 1);
+    });
+
 }
 
 #[test]
@@ -90,6 +101,16 @@ fn test_cancel_proposal() {
             assert!(r.is_err())
         },
     );
+
+    // Verify proposal manager status
+    suite.query_status(|r| {
+        let status = r.unwrap();
+        assert_eq!(status.total_proposals, 1);
+        assert_eq!(status.total_proposals_cancelled, 1);
+        assert_eq!(status.total_proposals_yes, 0);
+        assert_eq!(status.total_proposals_no, 0);
+        assert_eq!(status.total_proposals_pending, 0);
+    });
 }
 
 #[test]
@@ -173,6 +194,16 @@ fn test_proposal_response() {
             Some("I decline!".to_string()),
             |r: Result<AppResponse, anyhow::Error>| assert!(r.is_ok()),
         );
+
+    // Verify proposal manager status
+    suite.query_status(|r| {
+        let status = r.unwrap();
+        assert_eq!(status.total_proposals, 2);
+        assert_eq!(status.total_proposals_cancelled, 0);
+        assert_eq!(status.total_proposals_yes, 1);
+        assert_eq!(status.total_proposals_no, 1);
+        assert_eq!(status.total_proposals_pending, 0);
+    });
 }
 
 #[test]
@@ -296,6 +327,16 @@ fn test_query_proposals() {
             assert!(proposals.iter().all(|p| p.receiver == receiver));
         },
     );
+
+    // Verify proposal manager status
+    suite.query_status(|r| {
+        let status = r.unwrap();
+        assert_eq!(status.total_proposals, 3);
+        assert_eq!(status.total_proposals_cancelled, 0);
+        assert_eq!(status.total_proposals_yes, 0);
+        assert_eq!(status.total_proposals_no, 0);
+        assert_eq!(status.total_proposals_pending, 3);
+    });
 }
 
 #[test]

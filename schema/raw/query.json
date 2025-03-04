@@ -94,6 +94,19 @@
       "additionalProperties": false
     },
     {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    {
       "description": "Query the contract's ownership information",
       "type": "object",
       "required": [

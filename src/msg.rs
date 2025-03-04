@@ -72,6 +72,9 @@ pub enum QueryMsg {
         /// Sort proposals by id
         sort: Option<Order>,
     },
+
+    #[returns(Status)]
+    Status {},
 }
 
 #[cw_serde]
@@ -80,6 +83,15 @@ pub struct MigrateMsg {}
 #[cw_serde]
 pub struct ProposalsResponse {
     pub proposals: Vec<Proposal>,
+}
+
+#[cw_serde]
+pub struct Status {
+    pub total_proposals: u64,
+    pub total_proposals_pending: u64,
+    pub total_proposals_yes: u64,
+    pub total_proposals_no: u64,
+    pub total_proposals_cancelled: u64,
 }
 
 /// Filter proposals by proposer or receiver

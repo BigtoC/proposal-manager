@@ -9,6 +9,7 @@ pub const CONFIG: Item<Config> = Item::new("config");
 pub const PROPOSAL_COUNTER: Item<u64> = Item::new("proposal_count");
 pub const SUCCESSFUL_COUNTER: Item<u64> = Item::new("successful_proposals");
 pub const FAILED_COUNTER: Item<u64> = Item::new("failed_proposals");
+pub const CANCELED_COUNTER: Item<u64> = Item::new("canceled_proposals");
 pub const PROPOSALS: IndexedMap<u64, Proposal, ProposalIndexes> = IndexedMap::new(
     "proposals",
     ProposalIndexes {

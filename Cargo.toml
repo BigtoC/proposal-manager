@@ -2,7 +2,7 @@
 name = "proposal_manager"
 authors                 = ["allthatjazzleo"]
 description             = "The Proposal Manager is a contract that allows to manage proposals in a single contract."
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

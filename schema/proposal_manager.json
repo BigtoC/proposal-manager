@@ -1,6 +1,6 @@
 {
   "contract_name": "proposal_manager",
-  "contract_version": "0.1.0",
+  "contract_version": "0.1.1",
   "idl_version": "1.0.0",
   "instantiate": {
     "$schema": "http://json-schema.org/draft-07/schema#",
@@ -458,6 +458,19 @@
         "additionalProperties": false
       },
       {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "object",
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      {
         "description": "Query the contract's ownership information",
         "type": "object",
         "required": [
@@ -883,6 +896,46 @@
           "type": "string"
         }
       }
+    },
+    "status": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Status",
+      "type": "object",
+      "required": [
+        "total_proposals",
+        "total_proposals_cancelled",
+        "total_proposals_no",
+        "total_proposals_pending",
+        "total_proposals_yes"
+      ],
+      "properties": {
+        "total_proposals": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "total_proposals_cancelled": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "total_proposals_no": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "total_proposals_pending": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "total_proposals_yes": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        }
+      },
+      "additionalProperties": false
     }
   }
 }

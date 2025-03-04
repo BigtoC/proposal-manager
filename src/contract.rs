@@ -6,10 +6,10 @@ use crate::helpers::{
     aggregate_coins, validate_fees_are_paid,
     validate_no_additional_funds_sent_with_proposal_creation,
 };
-use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, ProposalBy, ProposalsResponse, QueryMsg};
+use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, ProposalBy, ProposalsResponse, Status, QueryMsg};
 use crate::proposal::state::{
     Config, Proposal, ProposalStatus, CONFIG, DEFAULT_LIMIT, FAILED_COUNTER, MAX_ITEMS_LIMIT,
-    PROPOSALS, PROPOSAL_COUNTER, SUCCESSFUL_COUNTER,
+    PROPOSALS, PROPOSAL_COUNTER, SUCCESSFUL_COUNTER, CANCELED_COUNTER,
 };
 use crate::validate_contract;
 use cosmwasm_std::{
@@ -38,6 +38,7 @@ pub fn instantiate(
     // Initialize counter
     PROPOSAL_COUNTER.save(deps.storage, &0)?;
     SUCCESSFUL_COUNTER.save(deps.storage, &0)?;
+    CANCELED_COUNTER.save(deps.storage, &0)?;
     FAILED_COUNTER.save(deps.storage, &0)?;
 
     let owner = deps
@@ -138,6 +139,7 @@ pub fn execute(
             total_refund = aggregate_coins(total_refund)?;
 
             PROPOSALS.remove(deps.storage, id);
+            CANCELED_COUNTER.update(deps.storage, |count| -> StdResult<_> { Ok(count + 1) })?;
 
             Ok(Response::new().add_messages(messages).add_attributes(vec![
                 ("action", "cancel_proposal"),
@@ -298,6 +300,7 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> Result<Binary, StdError> {
             status,
             sort,
         } => query_proposals(deps, limit, filter_by, status, sort),
+        QueryMsg::Status {} => query_status(deps),
         QueryMsg::Ownership {} => Ok(to_json_binary(&cw_ownable::get_ownership(deps.storage)?)?),
     }
 }
@@ -364,6 +367,22 @@ fn query_proposals(
     };
 
     to_json_binary(&ProposalsResponse { proposals })
+}
+
+fn query_status(deps: Deps) -> Result<Binary, StdError> {
+    let total_proposals = PROPOSAL_COUNTER.load(deps.storage)?;
+    let total_proposals_yes = SUCCESSFUL_COUNTER.load(deps.storage)?;
+    let total_proposals_no = FAILED_COUNTER.load(deps.storage)?;
+    let total_proposals_cancelled = CANCELED_COUNTER.load(deps.storage)?;
+    let total_proposals_pending = total_proposals - total_proposals_yes - total_proposals_no - total_proposals_cancelled;
+
+    to_json_binary(&Status {
+        total_proposals,
+        total_proposals_pending,
+        total_proposals_yes,
+        total_proposals_no,
+        total_proposals_cancelled,
+    })
 }
 
 fn get_proposal_by_index_prefix(

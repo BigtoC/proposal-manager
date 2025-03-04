@@ -4,7 +4,7 @@ use cw_multi_test::{
     WasmKeeper,
 };
 
-use proposal_manager::msg::{ExecuteMsg, InstantiateMsg, ProposalBy, ProposalsResponse, QueryMsg};
+use proposal_manager::msg::{ExecuteMsg, InstantiateMsg, ProposalBy, ProposalsResponse, Status, QueryMsg};
 use proposal_manager::proposal::state::{Config, Proposal, ProposalStatus};
 
 type WasmApp = App<BankKeeper, MockApiBech32>;
@@ -279,6 +279,11 @@ impl TestingSuite {
             },
             result,
         )
+    }
+
+    #[track_caller]
+    pub fn query_status(&mut self, result: impl Fn(StdResult<Status>)) -> &mut Self {
+        self.query_contract(QueryMsg::Status {}, result)
     }
 
     #[track_caller]
