@@ -6,10 +6,12 @@ use crate::helpers::{
     aggregate_coins, validate_fees_are_paid,
     validate_no_additional_funds_sent_with_proposal_creation,
 };
-use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, ProposalBy, ProposalsResponse, Status, QueryMsg};
+use crate::msg::{
+    ExecuteMsg, InstantiateMsg, MigrateMsg, ProposalBy, ProposalsResponse, QueryMsg, Status,
+};
 use crate::proposal::state::{
-    Config, Proposal, ProposalStatus, CONFIG, DEFAULT_LIMIT, FAILED_COUNTER, MAX_ITEMS_LIMIT,
-    PROPOSALS, PROPOSAL_COUNTER, SUCCESSFUL_COUNTER, CANCELED_COUNTER,
+    Config, Proposal, ProposalStatus, CANCELED_COUNTER, CONFIG, DEFAULT_LIMIT, FAILED_COUNTER,
+    MAX_ITEMS_LIMIT, PROPOSALS, PROPOSAL_COUNTER, SUCCESSFUL_COUNTER,
 };
 use crate::validate_contract;
 use cosmwasm_std::{
@@ -374,7 +376,8 @@ fn query_status(deps: Deps) -> Result<Binary, StdError> {
     let total_proposals_yes = SUCCESSFUL_COUNTER.load(deps.storage)?;
     let total_proposals_no = FAILED_COUNTER.load(deps.storage)?;
     let total_proposals_cancelled = CANCELED_COUNTER.load(deps.storage)?;
-    let total_proposals_pending = total_proposals - total_proposals_yes - total_proposals_no - total_proposals_cancelled;
+    let total_proposals_pending =
+        total_proposals - total_proposals_yes - total_proposals_no - total_proposals_cancelled;
 
     to_json_binary(&Status {
         total_proposals,

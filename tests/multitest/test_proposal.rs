@@ -57,7 +57,6 @@ fn test_proposal_creation() {
         assert_eq!(status.total_proposals_no, 0);
         assert_eq!(status.total_proposals_pending, 1);
     });
-
 }
 
 #[test]

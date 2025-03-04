@@ -4,7 +4,9 @@ use cw_multi_test::{
     WasmKeeper,
 };
 
-use proposal_manager::msg::{ExecuteMsg, InstantiateMsg, ProposalBy, ProposalsResponse, Status, QueryMsg};
+use proposal_manager::msg::{
+    ExecuteMsg, InstantiateMsg, ProposalBy, ProposalsResponse, QueryMsg, Status,
+};
 use proposal_manager::proposal::state::{Config, Proposal, ProposalStatus};
 
 type WasmApp = App<BankKeeper, MockApiBech32>;
