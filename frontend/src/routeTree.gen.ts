@@ -17,9 +17,6 @@ import { Route as rootRoute } from './routes/__root'
 // Create Virtual Routes
 
 const ProposalManagerLazyImport = createFileRoute('/proposal-manager')()
-const ProposalManagerLoveLazyImport = createFileRoute(
-  '/proposal-manager/love/💖',
-)()
 
 // Create/Update Routes
 
@@ -29,14 +26,6 @@ const ProposalManagerLazyRoute = ProposalManagerLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() =>
   import('./routes/proposal-manager.lazy').then((d) => d.Route),
-)
-
-const ProposalManagerLoveLazyRoute = ProposalManagerLoveLazyImport.update({
-  id: '/love/💖',
-  path: '/love/💖',
-  getParentRoute: () => ProposalManagerLazyRoute,
-} as any).lazy(() =>
-  import('./routes/proposal-manager.love.💖.lazy').then((d) => d.Route),
 )
 
 // Populate the FileRoutesByPath interface
@@ -50,60 +39,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProposalManagerLazyImport
       parentRoute: typeof rootRoute
     }
-    '/proposal-manager/love/💖': {
-      id: '/proposal-manager/love/💖'
-      path: '/love/💖'
-      fullPath: '/proposal-manager/love/💖'
-      preLoaderRoute: typeof ProposalManagerLoveLazyImport
-      parentRoute: typeof ProposalManagerLazyImport
-    }
   }
 }
 
 // Create and export the route tree
 
-interface ProposalManagerLazyRouteChildren {
-  ProposalManagerLoveLazyRoute: typeof ProposalManagerLoveLazyRoute
-}
-
-const ProposalManagerLazyRouteChildren: ProposalManagerLazyRouteChildren = {
-  ProposalManagerLoveLazyRoute: ProposalManagerLoveLazyRoute,
-}
-
-const ProposalManagerLazyRouteWithChildren =
-  ProposalManagerLazyRoute._addFileChildren(ProposalManagerLazyRouteChildren)
-
 export interface FileRoutesByFullPath {
-  '/proposal-manager': typeof ProposalManagerLazyRouteWithChildren
-  '/proposal-manager/love/💖': typeof ProposalManagerLoveLazyRoute
+  '/proposal-manager': typeof ProposalManagerLazyRoute
 }
 
 export interface FileRoutesByTo {
-  '/proposal-manager': typeof ProposalManagerLazyRouteWithChildren
-  '/proposal-manager/love/💖': typeof ProposalManagerLoveLazyRoute
+  '/proposal-manager': typeof ProposalManagerLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/proposal-manager': typeof ProposalManagerLazyRouteWithChildren
-  '/proposal-manager/love/💖': typeof ProposalManagerLoveLazyRoute
+  '/proposal-manager': typeof ProposalManagerLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/proposal-manager' | '/proposal-manager/love/💖'
+  fullPaths: '/proposal-manager'
   fileRoutesByTo: FileRoutesByTo
-  to: '/proposal-manager' | '/proposal-manager/love/💖'
-  id: '__root__' | '/proposal-manager' | '/proposal-manager/love/💖'
+  to: '/proposal-manager'
+  id: '__root__' | '/proposal-manager'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  ProposalManagerLazyRoute: typeof ProposalManagerLazyRouteWithChildren
+  ProposalManagerLazyRoute: typeof ProposalManagerLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  ProposalManagerLazyRoute: ProposalManagerLazyRouteWithChildren,
+  ProposalManagerLazyRoute: ProposalManagerLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -120,14 +88,7 @@ export const routeTree = rootRoute
       ]
     },
     "/proposal-manager": {
-      "filePath": "proposal-manager.lazy.tsx",
-      "children": [
-        "/proposal-manager/love/💖"
-      ]
-    },
-    "/proposal-manager/love/💖": {
-      "filePath": "proposal-manager.love.💖.lazy.tsx",
-      "parent": "/proposal-manager"
+      "filePath": "proposal-manager.lazy.tsx"
     }
   }
 }

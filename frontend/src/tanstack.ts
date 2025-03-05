@@ -8,7 +8,7 @@ import { routeTree } from './routeTree.gen';
 const queryClient = new QueryClient();
 
 const memoryHistory = createMemoryHistory({
-  initialEntries: ['/proposal-manager/love/💖'],
+  initialEntries: ['/proposal-manager/'],
 });
 
 const router = createRouter({
