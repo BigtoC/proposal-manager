@@ -7,6 +7,7 @@ import {
 import { RouterProvider } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
+import { LoveAppProvider } from '@/context/LoveAppContext.tsx';
 import { Toaster } from '@/shadcn/components/ui/toaster';
 import { useToast } from '@/shadcn/hooks/use-toast';
 
@@ -54,7 +55,9 @@ function App() {
           }
           walletConnectOptions={WALLET_CONNECT_OPTIONS}
         >
-          <RouterProvider router={router} />
+          <LoveAppProvider>
+            <RouterProvider router={router} />
+          </LoveAppProvider>
         </MantraProvider>
       </QueryClientProvider>
       <Toaster />

@@ -2,7 +2,7 @@ import { useCosmWasmClients, useMantra } from '@mantrachain/connect';
 import { useQuery } from '@tanstack/react-query';
 
 import { ProposalManagerQueryClient } from '@/__generated__/ProposalManager.client';
-import { isLoveApp } from '@/lib/utils.ts';
+import { useLoveApp } from '@/context/LoveAppContext.tsx';
 import {
   Tabs,
   TabsContent,
@@ -75,14 +75,15 @@ const Connected = () => {
 
 export const Main = () => {
   const { address } = useMantra();
+  const { isLoveApp } = useLoveApp();
 
   return (
     <div className="container">
       <h1 className="text-4xl font-semibold text-center mt-10">
-        {isLoveApp() ? 'Love on the Chain ❤️' : 'Make a deal on chain'}
+        {isLoveApp ? 'Love on the Chain ❤️' : 'Make a deal on chain'}
       </h1>
       <p className="text-sm text-center mt-3">
-        {isLoveApp() ? 'Express your love' : 'Manage your proposals'} on Mantra
+        {isLoveApp ? 'Express your love' : 'Manage your proposals'} on MANTRA
         Chain!{' '}
         <span className="text-pink-400">Create or respond to proposals</span>{' '}
         with a gift of tokens.

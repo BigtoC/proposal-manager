@@ -4,8 +4,3 @@ import { twMerge } from 'tailwind-merge';
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-
-export function isLoveApp() {
-  // 💖-> %F0%9F%92%96
-  return window.location.pathname.includes('/love/%F0%9F%92%96');
-}

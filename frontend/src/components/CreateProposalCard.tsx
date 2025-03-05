@@ -7,9 +7,9 @@ import { useMemo, useState } from 'react';
 
 import { ProposalManagerQueryClient } from '@/__generated__/ProposalManager.client';
 import { Coin } from '@/__generated__/ProposalManager.types';
+import { useLoveApp } from '@/context/LoveAppContext.tsx';
 import { useAllNativeTokenBalances } from '@/hooks/useAllNativeTokenBalances';
 import { useCreateProposalMutation } from '@/hooks/useCreateProposalMutation';
-import { isLoveApp } from '@/lib/utils.ts';
 import { Button } from '@/shadcn/components/ui/button';
 import {
   Card,
@@ -188,6 +188,8 @@ export const CreateProposalCard: React.FC<Props> = ({ onSuccess }) => {
     return formatTokenBalance(successfulProposalFee.amount);
   }, [successfulProposalFee]);
 
+  const { isLoveApp } = useLoveApp();
+
   return (
     <Card className="w-[900px]">
       <CardHeader>
@@ -212,7 +214,7 @@ export const CreateProposalCard: React.FC<Props> = ({ onSuccess }) => {
             className="font-mono"
             type="string"
             id="title"
-            placeholder={isLoveApp() ? 'Marry me' : "Let's collaborate!"}
+            placeholder={isLoveApp ? 'Marry me' : "Let's collaborate!"}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -223,7 +225,7 @@ export const CreateProposalCard: React.FC<Props> = ({ onSuccess }) => {
             className="font-mono"
             type="string"
             id="speech"
-            placeholder={isLoveApp() ? 'I love you' : 'Deal! Delay no more!'}
+            placeholder={isLoveApp ? 'I love you' : 'Deal! Delay no more!'}
             value={speech}
             onChange={(e) => setSpeech(e.target.value)}
           />
