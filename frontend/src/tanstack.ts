@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { createHashHistory, createRouter } from '@tanstack/react-router';
+import { createMemoryHistory, createRouter } from '@tanstack/react-router';
 
 import { routeTree } from './routeTree.gen';
 
@@ -7,11 +7,13 @@ import { routeTree } from './routeTree.gen';
 
 const queryClient = new QueryClient();
 
-const hashHistory = createHashHistory();
+const memoryHistory = createMemoryHistory({
+  initialEntries: ['/proposal-manager/love/💖'],
+});
 
 const router = createRouter({
   routeTree,
-  history: hashHistory,
+  history: memoryHistory,
   context: {
     queryClient,
   },
