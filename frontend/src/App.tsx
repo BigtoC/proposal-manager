@@ -4,13 +4,13 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
+import { RouterProvider } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
 import { Toaster } from '@/shadcn/components/ui/toaster';
 import { useToast } from '@/shadcn/hooks/use-toast';
 
-import { Main } from './components/Main';
-import { Navbar } from './components/Navbar';
+import { router } from './tanstack';
 import { getAppConfig } from './utils/getAppConfig';
 
 const WALLET_CONNECT_OPTIONS = {
@@ -54,8 +54,7 @@ function App() {
           }
           walletConnectOptions={WALLET_CONNECT_OPTIONS}
         >
-          <Navbar />
-          <Main />
+          <RouterProvider router={router} />
         </MantraProvider>
       </QueryClientProvider>
       <Toaster />
