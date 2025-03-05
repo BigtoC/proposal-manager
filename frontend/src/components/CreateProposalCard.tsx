@@ -9,6 +9,7 @@ import { ProposalManagerQueryClient } from '@/__generated__/ProposalManager.clie
 import { Coin } from '@/__generated__/ProposalManager.types';
 import { useAllNativeTokenBalances } from '@/hooks/useAllNativeTokenBalances';
 import { useCreateProposalMutation } from '@/hooks/useCreateProposalMutation';
+import { isLoveApp } from '@/lib/utils.ts';
 import { Button } from '@/shadcn/components/ui/button';
 import {
   Card,
@@ -211,7 +212,7 @@ export const CreateProposalCard: React.FC<Props> = ({ onSuccess }) => {
             className="font-mono"
             type="string"
             id="title"
-            placeholder="Marry me"
+            placeholder={isLoveApp() ? 'Marry me' : "Let's collaborate!"}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -222,7 +223,7 @@ export const CreateProposalCard: React.FC<Props> = ({ onSuccess }) => {
             className="font-mono"
             type="string"
             id="speech"
-            placeholder="I love you"
+            placeholder={isLoveApp() ? 'I love you' : 'Deal! Delay no more!'}
             value={speech}
             onChange={(e) => setSpeech(e.target.value)}
           />
